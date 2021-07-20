@@ -22,6 +22,7 @@ TWO_MINUTES = 150
 def new_world_news(cat):
     """[categories]
 
+    lore,
     general,
     updates
     """
