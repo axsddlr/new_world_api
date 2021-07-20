@@ -1,0 +1,5 @@
+beautifulsoup4==4.9.3
+requests>=2.18.4
+fastapi==0.66.1
+ujson==4.0.2
+uvicorn[standard]
