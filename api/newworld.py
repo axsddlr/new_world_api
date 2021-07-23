@@ -1,3 +1,4 @@
+import re
 import requests
 from bs4 import BeautifulSoup
 
@@ -70,6 +71,45 @@ class NewWorld:
                 }
             )
 
+        data = {"status": status, "data": result}
+
+        if status != 200:
+            raise Exception("API response: {}".format(status))
+        return data
+
+    def nww_forums(self, cat):
+        headers = {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36",
+        }
+        URL = "https://forums.newworld.com/c/english-community/official-news/50"
+        html = requests.get(URL, headers=headers)
+        soup = BeautifulSoup(html.content, "html.parser")
+        status = html.status_code
+
+        tbody = soup.find("tbody")
+        containers = tbody.findAll("tr")
+        result = []
+        for container in containers:
+            url_container = container.find("td", {"class": "main-link"})
+            url = url_container.find("a")["href"]
+
+            title_container = container.find("td", {"class": "main-link"})
+            title = title_container.find(
+                "a", {"class": "title raw-link raw-topic-link"}
+            ).text.strip()
+
+            poster_container = container.find("td", {"class": "posters"})
+            poster = poster_container.find("a")["href"].split("/")[-1]
+
+            if f"[{cat}]" in title:
+
+                result.append(
+                    {
+                        "title": title,
+                        "url": url,
+                        "author": poster,
+                    }
+                )
         data = {"status": status, "data": result}
 
         if status != 200:
