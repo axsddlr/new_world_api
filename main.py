@@ -18,7 +18,7 @@ TWO_MINUTES = 150
 
 
 @limits(calls=250, period=TWO_MINUTES)
-@app.get("/newworld/v1/{cat}")
+@app.get("/newworld/v1/{cat}", tags=["News"])
 def new_world_news(cat):
     """[categories]
 
@@ -30,7 +30,7 @@ def new_world_news(cat):
 
 
 @limits(calls=250, period=TWO_MINUTES)
-@app.get("/newworld/v2/{cat}")
+@app.get("/newworld/v2/{cat}", tags=["News"])
 def new_world_forums(cat):
     """[categories]
 
@@ -40,6 +40,21 @@ def new_world_forums(cat):
     More Servers,
     """
     return nww.nww_forums(cat)
+
+
+@limits(calls=250, period=TWO_MINUTES)
+@app.get("/newworld/server/{server}", tags=["Status"])
+def new_world_server_status(server):
+    """
+
+    Server status
+    0 = NA EAST,
+    1 = EU CENTRAL,
+    2 = SA EAST,
+    3 = AP SOUTHEAST,
+    4 = US WEST,
+    """
+    return nww.server_status(server)
 
 
 if __name__ == "__main__":

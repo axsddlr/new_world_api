@@ -115,3 +115,40 @@ class NewWorld:
         if status != 200:
             raise Exception("API response: {}".format(status))
         return data
+
+    def server_status(self, server):
+        headers = {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36",
+        }
+        URL = f"https://www.newworld.com/en-us/support/server-status"
+        html = requests.get(URL, headers=headers)
+        soup = BeautifulSoup(html.content, "html.parser")
+        status = html.status_code
+
+        nwws = soup.find("div", {"class": "ags-ServerStatus-content-responses"})
+        nwws_ = nwws.find("div", {"data-index": f"{server}"})
+        nww_module = nwws_.find_all(
+            "div",
+            {"class": "ags-ServerStatus-content-responses-response-server"},
+        )
+
+        result = []
+        for module in nww_module:
+
+            # title of articles
+            title = module.find(
+                "div",
+                {"class": "ags-ServerStatus-content-responses-response-server-name"},
+            ).text.strip()
+
+            result.append(
+                {
+                    "server-name": title,
+                }
+            )
+
+        data = {"status": status, "data": result}
+
+        if status != 200:
+            raise Exception("API response: {}".format(status))
+        return data
