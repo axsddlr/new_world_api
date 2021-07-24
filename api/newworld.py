@@ -102,7 +102,9 @@ class NewWorld:
             poster_container = container.find("td", {"class": "posters"})
             poster = poster_container.find("a")["href"].split("/")[-1]
 
-            if f"[{cat}]" in title:
+            category = res.forums[str(cat)]
+
+            if f"[{category}]" in title:
 
                 result.append(
                     {

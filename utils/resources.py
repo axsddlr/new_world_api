@@ -10,3 +10,10 @@ region = {
     "naw": "4",
     "NAW": "4",
 }
+
+forums = {
+    "downtime": "Downtime",
+    "announcement": "Announcement",
+    "known issue": "Known Issue",
+    "more servers": "More Servers",
+}
