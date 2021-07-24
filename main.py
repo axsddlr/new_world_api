@@ -20,11 +20,11 @@ TWO_MINUTES = 150
 @limits(calls=250, period=TWO_MINUTES)
 @app.get("/newworld/v1/{cat}", tags=["News"])
 def new_world_news(cat):
-    """[categories]
+    """[categories]\n\n
 
-    lore,
-    general,
-    updates
+    lore \n
+    general\n
+    updates\n
     """
     return nww.news(cat)
 
@@ -32,12 +32,12 @@ def new_world_news(cat):
 @limits(calls=250, period=TWO_MINUTES)
 @app.get("/newworld/v2/{cat}", tags=["News"])
 def new_world_forums(cat):
-    """[categories]
-
-    Downtime,
-    Announcement,
-    Known Issue,
-    More Servers,
+    """
+    [categories]\n
+    Downtime \n
+    Announcement\n
+    Known Issue\n
+    More Servers\n
     """
     return nww.nww_forums(cat)
 
@@ -47,12 +47,12 @@ def new_world_forums(cat):
 def new_world_server_status(server):
     """
 
-    Server status
-    0 = NA EAST,
-    1 = EU CENTRAL,
-    2 = SA EAST,
-    3 = AP SOUTHEAST,
-    4 = US WEST,
+    Server status: \n\n
+    nae = US EAST \n
+    euc = EU CENTRAL \n
+    sae = SA EAST \n
+    aps = AP SOUTHEAST \n
+    naw = US WEST \n
     """
     return nww.server_status(server)
 

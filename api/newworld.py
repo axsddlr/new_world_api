@@ -1,5 +1,6 @@
 import re
 import requests
+import utils.resources as res
 from bs4 import BeautifulSoup
 
 
@@ -125,6 +126,9 @@ class NewWorld:
         soup = BeautifulSoup(html.content, "html.parser")
         status = html.status_code
 
+        # assigns server variable to resources file and parses it to get the server name
+        server = res.region[str(server)]
+
         nwws = soup.find("div", {"class": "ags-ServerStatus-content-responses"})
         nwws_ = nwws.find("div", {"data-index": f"{server}"})
         nww_module = nwws_.find_all(
@@ -135,6 +139,19 @@ class NewWorld:
         result = []
         for module in nww_module:
 
+            # down = module.find(
+            #     "div",
+            #     {
+            #         "class": "ags-ServerStatus-content-responses-response-server-status ags-ServerStatus-content-responses-response-server-status--down"
+            #     },
+            # )
+            # up = module.find(
+            #     "div",
+            #     {
+            #         "class": "ags-ServerStatus-content-responses-response-server-status ags-ServerStatus-content-responses-response-server-status--up"
+            #     },
+            # )
+
             # title of articles
             title = module.find(
                 "div",
@@ -144,6 +161,8 @@ class NewWorld:
             result.append(
                 {
                     "server-name": title,
+                    # "up": up,
+                    # "down": down,
                 }
             )
 
