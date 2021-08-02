@@ -6,7 +6,7 @@ from ratelimit import limits
 app = FastAPI(
     title="New World Rest API",
     description="An Unofficial REST API for [newworld.com](https://www.newworld.com/en-us/), Made by [Andre Saddler](https://github.com/axsddlr)",
-    version="1.0.2",
+    version="1.0.3",
     docs_url="/",
     redoc_url=None,
 )
@@ -34,10 +34,10 @@ def new_world_news(cat):
 def new_world_forums(cat):
     """
     [categories]\n
-    Downtime \n
-    Announcement\n
-    Known Issue\n
-    More Servers\n
+    downtime \n
+    announcement\n
+    issue\n
+    server\n
     """
     return nww.nww_forums(cat)
 

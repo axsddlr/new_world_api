@@ -14,6 +14,6 @@ region = {
 forums = {
     "downtime": "Downtime",
     "announcement": "Announcement",
-    "known issue": "Known Issue",
-    "more servers": "More Servers",
+    "issue": "Issue",
+    "server": "Server",
 }

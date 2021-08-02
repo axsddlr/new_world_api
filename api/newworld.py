@@ -4,6 +4,17 @@ import utils.resources as res
 from bs4 import BeautifulSoup
 
 
+def getNWForums():
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36",
+    }
+    URL = (
+        "https://forums.newworld.com/c/english-community/official-news/50/l/latest.json"
+    )
+    response = requests.get(URL, headers=headers)
+    return response.json()
+
+
 class NewWorld:
     def news(self, cat):
         headers = {
@@ -79,41 +90,57 @@ class NewWorld:
         return data
 
     def nww_forums(self, cat):
-        headers = {
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36",
-        }
-        URL = "https://forums.newworld.com/c/english-community/official-news/50"
-        html = requests.get(URL, headers=headers)
-        soup = BeautifulSoup(html.content, "html.parser")
-        status = html.status_code
+        # https://forums.newworld.com/t/200431.json
+        apiResponse = getNWForums()
+        base = apiResponse["topic_list"]["topics"]
 
-        tbody = soup.find("tbody")
-        containers = tbody.findAll("tr")
-        result = []
-        for container in containers:
-            url_container = container.find("td", {"class": "main-link"})
-            url = url_container.find("a")["href"]
+        api = []
+        for each in base:
+            post_id = each["id"]
 
-            title_container = container.find("td", {"class": "main-link"})
-            title = title_container.find(
-                "a", {"class": "title raw-link raw-topic-link"}
-            ).text.strip()
+            URL = f"https://forums.newworld.com/t/{post_id}.json"
+            response = requests.get(URL)
+            responseJSON = response.json()
+            status = response.status_code
 
-            poster_container = container.find("td", {"class": "posters"})
-            poster = poster_container.find("a")["href"].split("/")[-1]
+            title = responseJSON["title"]
+            created_at = responseJSON["created_at"]
+            # post contents
+            post_content = responseJSON["post_stream"]["posts"][0]["cooked"]
+            # remove html tags from post content json string
+            post_content = re.sub(r"<.*?>", "", post_content)
+            # remove new lines from post content
+            post_content = re.sub(r"\n", " ", post_content)
+            # remove extra spaces from post content
+            post_content = re.sub(r"\s{2,}", " ", post_content)
+
+            # check if post is pinned
+            pinned = responseJSON["pinned"]
+            staff = responseJSON["post_stream"]["posts"][0]["staff"]
+
+            # author of post
+            author = responseJSON["post_stream"]["posts"][0]["username"]
+
+            # url to post
+            slug = responseJSON["slug"]
+            url = f"https://forums.newworld.com/t/{slug}/{post_id}"
 
             category = res.forums[str(cat)]
 
-            if f"[{category}]" in title:
+            # if it is not pinned and is a staff post
+            if not pinned and staff:
+                if category in title:
+                    api.append(
+                        {
+                            "title": title,
+                            "post_body": post_content,
+                            "created_at": created_at,
+                            "url": url,
+                            "author": author,
+                        }
+                    )
 
-                result.append(
-                    {
-                        "title": title,
-                        "url": url,
-                        "author": poster,
-                    }
-                )
-        data = {"status": status, "data": result}
+        data = {"status": status, "data": api}
 
         if status != 200:
             raise Exception("API response: {}".format(status))
