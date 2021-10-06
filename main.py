@@ -1,24 +1,27 @@
 from fastapi import FastAPI
 import uvicorn
-from api.newworld import NewWorld
+from api.nww_news import NewWorld
+from api.nww_status import Status
 from ratelimit import limits
 
 app = FastAPI(
     title="New World Rest API",
-    description="An Unofficial REST API for [newworld.com](https://www.newworld.com/en-us/), Made by [Andre Saddler](https://github.com/axsddlr)",
-    version="1.0.3",
+    description="An Unofficial REST API for [newworld.com](https://www.newworld.com/en-us/), Made by [Andre Saddler]("
+                "https://github.com/axsddlr)",
+    version="1.0.4",
     docs_url="/",
     redoc_url=None,
 )
 
-# init class
+# init classes
 nww = NewWorld()
+statuschk = Status()
 
 TWO_MINUTES = 150
 
 
 @limits(calls=250, period=TWO_MINUTES)
-@app.get("/newworld/v1/{cat}", tags=["News"])
+@app.get("/news/{cat}", tags=["News"])
 def new_world_news(cat):
     """[categories]\n\n
 
@@ -30,22 +33,28 @@ def new_world_news(cat):
 
 
 @limits(calls=250, period=TWO_MINUTES)
-@app.get("/newworld/v2/{cat}", tags=["News"])
-def new_world_forums(cat):
+@app.get("/forums", tags=["News"])
+def new_world_forums():
     """
-    [categories]\n
-    downtime \n
-    announcement\n
-    issue\n
-    server\n
+    News and Updates via official news section of forums
     """
-    return nww.nww_forums(cat)
+    return nww.nww_forums()
 
 
 @limits(calls=250, period=TWO_MINUTES)
-@app.get("/newworld/server/{server}", tags=["Status"])
-def new_world_server_status(server):
+@app.get("/forums/{cat}", tags=["News"])
+def new_world_forums_categories(cat):
     """
+    News and Updates via official news section of forums
+    """
+    return nww.nww_forums_category(cat)
+
+
+@limits(calls=250, period=TWO_MINUTES)
+@app.get("/server_list/{region}", tags=["Status"])
+def new_world_server_list(region):
+    """
+    Servers available per region
 
     Server status: \n\n
     nae = US EAST \n
@@ -54,7 +63,18 @@ def new_world_server_status(server):
     aps = AP SOUTHEAST \n
     naw = US WEST \n
     """
-    return nww.server_status(server)
+    return nww.server_status(region)
+
+
+@limits(calls=250, period=TWO_MINUTES)
+@app.get("/server/{server}", tags=["Status"])
+def new_world_server_status_check(server):
+    """
+    Enter Server Name\n
+    i.e: http://newworldapi.herokuapp.com/server/Hy-Brasil\n
+    result: "Hy-Brasil is open"
+    """
+    return statuschk.get_status(server)
 
 
 if __name__ == "__main__":
