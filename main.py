@@ -63,7 +63,7 @@ def new_world_server_list(region):
     aps = AP SOUTHEAST \n
     naw = US WEST \n
     """
-    return nww.server_status(region)
+    return statuschk.server_status(region)
 
 
 @limits(calls=250, period=TWO_MINUTES)
