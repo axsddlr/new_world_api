@@ -157,7 +157,7 @@ class NewWorld:
         apiResponse = getNWForums()
         base = apiResponse["topic_list"]["topics"]
 
-        api = []
+        posts = []
         for each in base:
             post_id = each["id"]
 
@@ -190,20 +190,19 @@ class NewWorld:
 
             category = res.forums[str(cat)]
 
-            # if it is not pinned and is a staff post
-            if not pinned and staff:
-                if category in title:
-                    api.append(
-                        {
-                            "title": title,
-                            "post_body": post_content,
-                            "created_at": created_at,
-                            "url": url,
-                            "author": author,
-                        }
-                    )
+            # if not pinned and staff:
+            if category in title:
+                posts.append(
+                    {
+                        "title": title,
+                        "post_body": post_content,
+                        "created_at": created_at,
+                        "url": url,
+                        "author": author,
+                    }
+                )
 
-        data = {"status": status, "data": api}
+        data = {"status": status, "data": posts}
 
         if status != 200:
             raise Exception("API response: {}".format(status))
