@@ -1,3 +1,4 @@
+import string
 import time
 
 import requests
@@ -18,7 +19,8 @@ def getserver():
 
 
 class Status:
-    def server_status(self, region):
+    @staticmethod
+    def server_status(region):
         URL = f"https://www.newworld.com/en-us/support/server-status"
         html = requests.get(URL, headers=headers)
         soup = BeautifulSoup(html.content, "html.parser")
@@ -120,6 +122,9 @@ class Status:
                 if world == world_name:
                     # Capitalize first letter
                     world_name = world_name.capitalize()
+                    # Account for hyphened world names
+                    if "-" in world_name:
+                        world_name = string.capwords(world_name, "-")
 
                     review = {
                         'world_name': world_name,

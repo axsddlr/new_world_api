@@ -91,10 +91,10 @@ def new_world_server_status_v1(server):
 @app.get("/v2/server/{world_name}", tags=["Status"])
 def new_world_server_status_v2(world_name):
     """
-Enter Server Name\n
-i.e: http://newworldapi.herokuapp.com/server/Hy-Brasil\n
+Enter World Name\n
+i.e: http://newworldapi.herokuapp.com/v2/server/Hy-Brasil\n
 result: \n
-    "world_name": "Hy-brasil",\n
+    "world_name": "Hy-Brasil",\n
     "current_players": 114,\n
     "max_players": 2000,\n
     "current_queue": 0,\n
