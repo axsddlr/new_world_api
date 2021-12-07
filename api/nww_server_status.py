@@ -19,7 +19,7 @@ def getserver():
 
 
 class Status:
-    
+
     @staticmethod
     def server_status(region):
         URL = f"https://www.newworld.com/en-us/support/server-status"
@@ -122,7 +122,7 @@ class Status:
                 current_queue_time = each[3]
                 current_status = each[8]
 
-                if world == world_name:
+                if world.lower() == world_name.lower():
                     # Capitalize first letter
                     world_name = world_name.capitalize()
                     # Account for hyphened world names
