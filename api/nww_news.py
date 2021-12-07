@@ -5,27 +5,30 @@ from bs4 import BeautifulSoup
 
 import utils.resources as res
 
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/74.0.3729.169 Safari/537.36",
+}
 
-def getNWForums():
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                      "Chrome/74.0.3729.169 Safari/537.36",
-    }
-    URL = (
-        # "https://forums.newworld.com/c/english-community/official-news/50/l/latest.json"
+
+def get_nw_forums():
+    url = (
         "https://forums.newworld.com/c/official-news/official-news/50/l/latest.json"
     )
-    response = requests.get(URL, headers=headers)
+    response = requests.get(url, headers=headers)
+    return response.json()
+
+
+def devblog():
+    url = "https://forums.newworld.com/c/developer-corner/88/l/latest.json"
+    response = requests.get(url, headers=headers)
     return response.json()
 
 
 class NewWorld:
-    def news(self, cat):
-        headers = {
 
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                          "Chrome/94.0.4606.61 Safari/537.36",
-        }
+    @staticmethod
+    def news(cat):
         URL = f"https://www.newworld.com/en-us/news?tag={cat}"
         html = requests.get(URL, headers=headers)
         soup = BeautifulSoup(html.content, "html.parser")
@@ -95,9 +98,10 @@ class NewWorld:
             raise Exception("API response: {}".format(status))
         return data
 
-    def nww_forums(self):
+    @staticmethod
+    def nww_forums():
         # https://forums.newworld.com/t/200431.json
-        apiResponse = getNWForums()
+        apiResponse = get_nw_forums()
         base = apiResponse["topic_list"]["topics"]
 
         api = []
@@ -152,9 +156,66 @@ class NewWorld:
             raise Exception("API response: {}".format(status))
         return data
 
-    def nww_forums_category(self, cat):
+    @staticmethod
+    def nww_forums_devblog():
         # https://forums.newworld.com/t/200431.json
-        apiResponse = getNWForums()
+        apiResponse = devblog()
+        base = apiResponse["topic_list"]["topics"]
+
+        api = []
+        for each in base:
+            post_id = each["id"]
+
+            URL = f"https://forums.newworld.com/t/{post_id}.json"
+            response = requests.get(URL)
+            responseJSON = response.json()
+            status = response.status_code
+
+            title = responseJSON["title"]
+            created_at = responseJSON["created_at"]
+            # post contents
+            post_content = responseJSON["post_stream"]["posts"][0]["cooked"]
+            # remove html tags from post content json string
+            post_content = re.sub(r"<.*?>", "", post_content)
+            # remove new lines from post content
+            post_content = re.sub(r"\n", " ", post_content)
+            # remove extra spaces from post content
+            post_content = re.sub(r"\s{2,}", " ", post_content)
+
+            # check if post is pinned
+            pinned = responseJSON["pinned"]
+            staff = responseJSON["post_stream"]["posts"][0]["staff"]
+
+            # author of post
+            author = responseJSON["post_stream"]["posts"][0]["username"]
+
+            # url to post
+            slug = responseJSON["slug"]
+            url = f"https://forums.newworld.com/t/{slug}/{post_id}"
+
+            # if it is not pinned and is a staff post
+            if not pinned and staff:
+                # if category in title:
+                api.append(
+                    {
+                        "title": title,
+                        "post_body": post_content,
+                        "created_at": created_at,
+                        "url": url,
+                        "author": author,
+                    }
+                )
+
+        data = {"status": status, "data": api}
+
+        if status != 200:
+            raise Exception("API response: {}".format(status))
+        return data
+
+    @staticmethod
+    def nww_forums_category(cat):
+        # https://forums.newworld.com/t/200431.json
+        apiResponse = get_nw_forums()
         base = apiResponse["topic_list"]["topics"]
 
         posts = []

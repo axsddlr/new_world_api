@@ -8,14 +8,14 @@ app = FastAPI(
     title="New World Rest API",
     description="An Unofficial REST API for [newworld.com](https://www.newworld.com/en-us/), Made by [Andre Saddler]("
                 "https://github.com/axsddlr)",
-    version="1.0.4",
+    version="1.0.5",
     docs_url="/",
     redoc_url=None,
 )
 
 # init classes
 nww = NewWorld()
-statuschk = Status()
+server_status = Status()
 
 TWO_MINUTES = 150
 
@@ -42,6 +42,15 @@ def new_world_forums():
 
 
 @limits(calls=250, period=TWO_MINUTES)
+@app.get("/forums/devblogs", tags=["News"])
+def new_world_dev_blogs():
+    """
+    Dev Blogs from forums.newworld.com
+    """
+    return nww.nww_forums_devblog()
+
+
+@limits(calls=250, period=TWO_MINUTES)
 @app.get("/forums/{cat}", tags=["News"])
 def new_world_forums_categories(cat):
     """
@@ -63,7 +72,7 @@ def new_world_server_list(region):
     aps = AP SOUTHEAST \n
     naw = US WEST \n
     """
-    return statuschk.server_status(region)
+    return server_status.server_status(region)
 
 
 @limits(calls=250, period=TWO_MINUTES)
@@ -74,7 +83,7 @@ def new_world_server_status_check(server):
     i.e: http://newworldapi.herokuapp.com/server/Hy-Brasil\n
     result: "Hy-Brasil is open"
     """
-    return statuschk.get_status(server)
+    return server_status.get_status(server)
 
 
 if __name__ == "__main__":
