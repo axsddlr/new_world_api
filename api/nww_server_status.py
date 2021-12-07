@@ -11,6 +11,12 @@ headers = {
 }
 
 
+def getserver():
+    url = "https://nwdb.info/server-status/servers.json"
+    response = requests.get(url, headers=headers)
+    return response.json()
+
+
 class Status:
     def server_status(self, region):
         URL = f"https://www.newworld.com/en-us/support/server-status"
@@ -57,7 +63,7 @@ class Status:
             raise Exception("API response: {}".format(status))
         return data
 
-    def get_status(self, server):
+    def get_status_v1(self, server):
         """Checks whether a server is full or not. Default server to check is Tumtum.
         A specific server can be set in the function argument."""
         full = True  # keep checking until the server has space
@@ -92,3 +98,39 @@ class Status:
         if 'ags-ServerStatus-content-responses-response-server-status--maintenance' in server_status_classes:
             return f"{server} is under maintenance right now."
         return
+
+    def get_status_v2(self, world_name):
+        responsejson = getserver()
+
+        status = responsejson["success"]
+
+        if status is None:
+            print("error parsing stream")
+        elif status:
+            base = responsejson["data"]["servers"]
+            # print(base)
+            for each in base:
+                world = each[4]
+                current_players = each[1]
+                maximum_players = each[0]
+                current_queue = each[2]
+                current_queue_time = each[3]
+                current_status = each[8]
+
+                if world == world_name:
+                    # Capitalize first letter
+                    world_name = world_name.capitalize()
+
+                    review = {
+                        'world_name': world_name,
+                        'current_players': current_players,
+                        'max_players': maximum_players,
+                        "current_queue": current_queue,
+                        "current_queue_time": current_queue_time,
+                        "status": current_status,
+                    }
+                    return review
+
+
+        else:
+            print("result fail")

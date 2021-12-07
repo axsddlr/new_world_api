@@ -1,14 +1,15 @@
-from fastapi import FastAPI
 import uvicorn
+from fastapi import FastAPI
+
 from api.nww_news import NewWorld
-from api.nww_status import Status
+from api.nww_server_status import Status
 from ratelimit import limits
 
 app = FastAPI(
     title="New World Rest API",
     description="An Unofficial REST API for [newworld.com](https://www.newworld.com/en-us/), Made by [Andre Saddler]("
                 "https://github.com/axsddlr)",
-    version="1.0.5",
+    version="1.0.6",
     docs_url="/",
     redoc_url=None,
 )
@@ -76,14 +77,31 @@ def new_world_server_list(region):
 
 
 @limits(calls=250, period=TWO_MINUTES)
-@app.get("/server/{server}", tags=["Status"])
-def new_world_server_status_check(server):
+@app.get("/v1/server/{server}", tags=["Status"])
+def new_world_server_status_v1(server):
     """
     Enter Server Name\n
     i.e: http://newworldapi.herokuapp.com/server/Hy-Brasil\n
     result: "Hy-Brasil is open"
     """
-    return server_status.get_status(server)
+    return server_status.get_status_v1(server)
+
+
+@limits(calls=250, period=TWO_MINUTES)
+@app.get("/v2/server/{world_name}", tags=["Status"])
+def new_world_server_status_v2(world_name):
+    """
+Enter Server Name\n
+i.e: http://newworldapi.herokuapp.com/server/Hy-Brasil\n
+result: \n
+    "world_name": "Hy-brasil",\n
+    "current_players": 114,\n
+    "max_players": 2000,\n
+    "current_queue": 0,\n
+    "current_queue_time": 147,\n
+    "status": "ACTIVE"\n
+    """
+    return server_status.get_status_v2(world_name)
 
 
 if __name__ == "__main__":
