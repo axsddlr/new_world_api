@@ -19,6 +19,7 @@ def getserver():
 
 
 class Status:
+    
     @staticmethod
     def server_status(region):
         URL = f"https://www.newworld.com/en-us/support/server-status"
@@ -65,7 +66,8 @@ class Status:
             raise Exception("API response: {}".format(status))
         return data
 
-    def get_status_v1(self, server):
+    @staticmethod
+    def get_status_v1(server):
         """Checks whether a server is full or not. Default server to check is Tumtum.
         A specific server can be set in the function argument."""
         full = True  # keep checking until the server has space
@@ -101,7 +103,8 @@ class Status:
             return f"{server} is under maintenance right now."
         return
 
-    def get_status_v2(self, world_name):
+    @staticmethod
+    def get_status_v2(world_name):
         responsejson = getserver()
 
         status = responsejson["success"]
